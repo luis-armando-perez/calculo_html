@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Variaciones y Permutaciones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .modal-enter {
+            animation: modalEnter 0.3s ease-out;
+        }
+        .modal-exit {
+            animation: modalExit 0.3s ease-in;
+        }
+        @keyframes modalEnter {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        @keyframes modalExit {
+            from {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0.9) translateY(-10px);
+            }
+        }
+    </style>
+    <script>
+        window.MathJax = {
+          tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+          svg: { fontCache: 'global' }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+  
+</head>
+<body class="min-h-full bg-gradient-to-br from-blue-50 to-indigo-100">
+    <nav class="bg-white shadow-md  fixed w-full z-20 top-0 left-0">
+        <div class="max-w-4xl mx-auto px-4 py-3">
+          <div class="flex justify-between items-center">
+            <!-- Logo / Nombre -->
+            <div class="text-xl font-bold text-blue-600">text</div>
+      
+            <!-- Botón Hamburguesa (solo visible en móviles) -->
+            <button
+              id="menu-toggle"
+              class="md:hidden text-gray-700 hover:text-blue-600 focus:outline-none"
+            >
+              <!-- Icono hamburguesa -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+      
+            <!-- Menú (por defecto visible en pantallas medianas hacia arriba) -->
+            <ul
+              id="menu"
+              class="hidden md:flex md:space-x-6 absolute md:static bg-white w-full left-0 top-14 md:top-auto shadow-md md:shadow-none flex-col md:flex-row md:items-center"
+            >
+              <li class="border-b md:border-none">
+                <a
+                  href="index.html"
+                  class="block px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                  >Conjuntos</a>
+              </li>
+              <li class="border-b md:border-none">
+                <a
+                  href="permutaciones.html"
+                  class="block px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                  >Permutaciones</a>
+              </li>
+              <li class="border-b md:border-none">
+                <a
+                  href="sucesos.html"
+                  class="block px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                  >Sucesos</a>
+              </li>
+              <li>
+                <a
+                  href="combinatorios.html"
+                  class="block px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                  >Combinatorios</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    <div class="container pt-20 mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Sistema de Variaciones y Permutaciones</h1>
+            <p class="text-lg text-gray-600">Calcula variaciones y permutaciones de forma sencilla</p>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            
+            <!-- Card 1: Variaciones sin repetición -->
+            <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Variaciones sin repetición</h2>
+                        <p class="text-sm text-gray-600 font-mono bg-gray-100 px-3 py-1 rounded">Fórmula: nPr = n! / (n-r)!</p>
+                    </div>
+                    <button onclick="openModal('modal1')" class="text-blue-500 hover:text-blue-700 transition-colors duration-200 text-xl">
+                        ℹ️
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">n (total)</label>
+                            <input id="n" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Ej: 10">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">r (selección)</label>
+                            <input id="r" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Ej: 3">
+                        </div>
+                    </div>
+                    
+                    <button id="btnCalcular_npr" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 transform hover:scale-105">
+                        Calcular
+                    </button>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p  class="text-sm text-gray-600 mb-1">Resultado:</p>
+                        <p id="resultado_nPr" class="text-2xl font-bold text-gray-800">---</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Variaciones con repetición -->
+            <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Variaciones con repetición</h2>
+                        <p class="text-sm text-gray-600 font-mono bg-gray-100 px-3 py-1 rounded">Fórmula: n^r</p>
+                    </div>
+                    <button onclick="openModal('modal2')" class="text-blue-500 hover:text-blue-700 transition-colors duration-200 text-xl">
+                        ℹ️
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">n (total)</label>
+                            <input id="n_repe" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200" placeholder="Ej: 10">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">r (selección)</label>
+                            <input id="r_repe" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200" placeholder="Ej: 3">
+                        </div>
+                    </div>
+                    
+                    <button id="btnCalcular_nr" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 transform hover:scale-105">
+                        Calcular
+                    </button>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 mb-1">Resultado:</p>
+                        <p id="resultado_nr" class="text-2xl font-bold text-gray-800">---</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Permutaciones sin repetición -->
+            <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Permutaciones sin repetición</h2>
+                        <p class="text-sm text-gray-600 font-mono bg-gray-100 px-3 py-1 rounded">Fórmula: n!</p>
+                    </div>
+                    <button onclick="openModal('modal3')" class="text-blue-500 hover:text-blue-700 transition-colors duration-200 text-xl">
+                        ℹ️
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">n (total)</label>
+                            <input  id="n_fact" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" placeholder="Ej: 5">
+                        </div>
+                        <div class="opacity-50">
+                            <label class="block text-sm font-medium text-gray-400 mb-1">r (no aplica)</label>
+                            <input type="number" disabled class="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-100" placeholder="---">
+                        </div>
+                    </div>
+                    
+                    <button id="btnCalcular_fact" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 transform hover:scale-105">
+                        Calcular
+                    </button>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 mb-1">Resultado:</p>
+                        <p id="resultado_fact" class="text-2xl font-bold text-gray-800">---</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Permutaciones con repetición -->
+            <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Permutaciones con repetición</h2>
+                        <p class="text-sm text-gray-600 font-mono bg-gray-100 px-3 py-1 rounded">Fórmula: n! / (n₁! × n₂! × ... × nₖ!)</p>
+                    </div>
+                    <button onclick="openModal('modal4')" class="text-blue-500 hover:text-blue-700 transition-colors duration-200 text-xl">
+                        ℹ️
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">n (total)</label>
+                            <input id="elementos_repe" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200" placeholder="Ej: m,a,m,a">
+                        </div>
+                    </div>
+                    
+                    <button id="btnCalcular_repe" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 transform hover:scale-105">
+                        Calcular
+                    </button>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="text-sm text-gray-600 mb-1">Resultado:</p>
+                        <p id="resultado_repe" class="text-2xl font-bold text-gray-800">---</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Modal 1 -->
+    <div id="modal1" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 max-w-md mx-4 modal-enter">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Variaciones sin repetición</h3>
+                <button onclick="closeModal('modal1')" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+            </div>
+            <p class="text-gray-600">
+                Es el número de formas de elegir y ordenar k elementos de un conjunto de n elementos, sin repetir ninguno.
+            </p>
+            <p class="text-gray-600">
+                $$V(n, k) = \frac{n!}{(n - k)!}$$
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal 2 -->
+    <div id="modal2" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 max-w-md mx-4 modal-enter">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Variaciones con repetición</h3>
+                <button onclick="closeModal('modal2')" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+            </div>
+            <p class="text-gray-600">
+                Es el número de formas de elegir y ordenar k elementos de un conjunto de n elementos, permitiendo repetir elementos.
+            </p>
+            <p class="text-gray-600">
+                $$V'(n, k) = n^k$$
+
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal 3 -->
+    <div id="modal3" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 max-w-md mx-4 modal-enter">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Permutaciones sin repetición</h3>
+                <button onclick="closeModal('modal3')" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+            </div>
+            <p class="text-gray-600">
+                Es el número de formas de ordenar todos los elementos de un conjunto de n elementos distintos.
+            </p>
+            <p class="text-gray-600">
+                $$P(n) = n!$$
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal 4 -->
+    <div id="modal4" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 max-w-md mx-4 modal-enter">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Permutaciones con repetición</h3>
+                <button onclick="closeModal('modal4')" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+            </div>
+            <p class="text-gray-600">
+                Es el número de formas de ordenar los elementos de un conjunto cuando algunos elementos se repiten.
+            </p>
+            <p class="text-gray-600">
+                $$P(n; n_1, n_2, \dots, n_k) = \frac{n!}{n_1! n_2! \dots n_k!}$$
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Trigger animation
+            const modalContent = modal.querySelector('div > div');
+            modalContent.classList.add('modal-enter');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            const modalContent = modal.querySelector('div > div');
+            
+            modalContent.classList.remove('modal-enter');
+            modalContent.classList.add('modal-exit');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                modalContent.classList.remove('modal-exit');
+            }, 300);
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('bg-black')) {
+                const modalId = e.target.id;
+                closeModal(modalId);
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const openModal = document.querySelector('.fixed:not(.hidden)');
+                if (openModal) {
+                    closeModal(openModal.id);
+                }
+            }
+        });
+    </script>
+
+    <script>
+        document.getElementById("menu-toggle").addEventListener("click", () => {
+          document.getElementById("menu").classList.toggle("hidden");
+        });
+      </script>
+
+    <script src="../js/permutaciones.js"></script>
+</body>
+</html>
