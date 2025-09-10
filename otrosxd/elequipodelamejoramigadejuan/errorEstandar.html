@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Estándar de la Media</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+    <!-- Card Principal -->
+    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+        <!-- Botón Info -->
+        <button id="infoBtn" class="absolute top-4 right-4 w-6 h-6 bg-blue-500 text-white rounded-full text-xs font-bold hover:bg-blue-600 transition-colors flex items-center justify-center">
+            i
+        </button>
+
+        <!-- Título -->
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Error Estándar de la Media</h1>
+        <p class="text-sm text-gray-600 mb-6 text-center">Muestreo de latas de refresco</p>
+
+        <!-- Inputs -->
+        <div class="space-y-4 mb-6">
+            <div>
+                <label for="mu" class="block text-sm font-medium text-gray-700 mb-1">Media poblacional esperada (μ) - ml</label>
+                <input type="number" id="mu" value="350" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
+                <p class="text-xs text-gray-500 mt-1">Solo informativa</p>
+            </div>
+            
+            <div>
+                <label for="sigma" class="block text-sm font-medium text-gray-700 mb-1">Desviación estándar poblacional (σ) - ml</label>
+                <input type="number" id="sigma" value="10" step="0.1" min="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label for="n" class="block text-sm font-medium text-gray-700 mb-1">Tamaño de la muestra (n)</label>
+                <input type="number" id="n" value="36" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <!-- Botón Calcular -->
+        <button id="calculateBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors font-medium">
+            Calcular
+        </button>
+
+        <!-- Área de Resultados -->
+        <div id="results" class="mt-6 p-4 bg-gray-50 rounded-md hidden">
+            <h3 class="font-semibold text-gray-800 mb-2">Resultado:</h3>
+            <p id="standardError" class="text-lg font-medium text-blue-600"></p>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg p-6 max-w-lg w-full max-h-96 overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Conceptos y Fórmulas</h2>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div class="space-y-4 text-sm text-gray-700">
+                <div>
+                    <h3 class="font-semibold mb-2">Concepto:</h3>
+                    <p>El error estándar de la media indica cuánto tienden a variar las medias muestrales de la verdadera media poblacional debido al muestreo aleatorio.</p>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-2">Fórmula:</h3>
+                    <p class="bg-gray-100 p-2 rounded text-center font-mono">E.E. = σ / √n</p>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-2">Interpretación:</h3>
+                    <p>A menor error estándar, más precisa es la estimación de la media poblacional.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Referencias a elementos
+        const infoBtn = document.getElementById('infoBtn');
+        const modal = document.getElementById('modal');
+        const closeModal = document.getElementById('closeModal');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const results = document.getElementById('results');
+        const standardError = document.getElementById('standardError');
+        const sigmaInput = document.getElementById('sigma');
+        const nInput = document.getElementById('n');
+
+        // Abrir modal
+        infoBtn.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+        });
+
+        // Cerrar modal
+        closeModal.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        // Cerrar modal al hacer clic fuera
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+
+        // Función para calcular el error estándar
+        function calculateStandardError() {
+            const sigma = parseFloat(sigmaInput.value);
+            const n = parseInt(nInput.value);
+
+            // Validaciones
+            if (isNaN(sigma) || sigma <= 0) {
+                alert('La desviación estándar debe ser un número positivo.');
+                return;
+            }
+
+            if (isNaN(n) || n <= 0) {
+                alert('El tamaño de la muestra debe ser un número entero positivo.');
+                return;
+            }
+
+            // Calcular error estándar
+            const ee = sigma / Math.sqrt(n);
+
+            // Mostrar resultado
+            standardError.textContent = `Error Estándar (E.E.) = ${ee.toFixed(2)} ml`;
+            results.classList.remove('hidden');
+        }
+
+        // Event listener para el botón calcular
+        calculateBtn.addEventListener('click', calculateStandardError);
+
+        // Permitir cálculo con Enter
+        [sigmaInput, nInput].forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    calculateStandardError();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

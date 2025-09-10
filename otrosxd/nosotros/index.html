@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribución de Probabilidad - 2 Monedas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for mathematical symbols */
+        .math-symbol {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <!-- Main Card -->
+    <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
+        <!-- Info Button -->
+        <button id="infoBtn" class="absolute top-4 right-4 w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-200" aria-label="Información">
+            i
+        </button>
+
+        <!-- Updated title to match new specification -->
+        <h1 class="text-xl font-bold text-gray-800 mb-6 text-center pr-8">
+            Distribución de probabilidad — 2 monedas
+        </h1>
+
+        <!-- Simplified input section with only number of coins -->
+        <div class="mb-4">
+            <label for="numCoins" class="block text-sm font-medium text-gray-700 mb-2">
+                Número de monedas
+            </label>
+            <input type="number" id="numCoins" min="1" max="10" value="2" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <!-- Calculate Button -->
+        <button id="calculateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 mb-6">
+            Calcular
+        </button>
+
+        <!-- Simplified results section with plain text format -->
+        <div id="results" class="hidden space-y-4">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Probabilidades:</h3>
+                <div id="probabilityResults" class="text-sm text-gray-700 space-y-1">
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Estadísticas:</h3>
+                <div class="text-sm text-gray-700 space-y-1">
+                    <p>Media (μ): <span id="meanResult" class="font-semibold"></span></p>
+                    <p>Varianza (σ²): <span id="varianceResult" class="font-semibold"></span></p>
+                    <p>Desviación estándar (σ): <span id="stdDevResult" class="font-semibold"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Updated modal content to match exact specification -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 relative">
+            <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl" aria-label="Cerrar">
+                ×
+            </button>
+            
+            <h2 id="modalTitle" class="text-xl font-bold text-gray-800 mb-4 pr-6">Conceptos y Fórmulas</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-base font-semibold text-blue-800 mb-2">Concepto:</h3>
+                    <p class="text-sm text-gray-700">Distribución de probabilidad de una variable aleatoria discreta aplicada al lanzamiento de dos monedas.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-base font-semibold text-blue-800 mb-2">Fórmulas:</h3>
+                    <div class="space-y-2 text-sm text-gray-700">
+                        <p><strong>Media (μ):</strong> μ = Σ x ⋅ P(X=x)</p>
+                        <p><strong>Varianza (σ²):</strong> σ² = Σ x² ⋅ P(X=x) − μ²</p>
+                        <p><strong>Desviación estándar (σ):</strong> σ = √σ²</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const infoBtn = document.getElementById('infoBtn');
+        const modal = document.getElementById('modal');
+        const closeModal = document.getElementById('closeModal');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const numCoinsInput = document.getElementById('numCoins');
+        const probabilityResults = document.getElementById('probabilityResults');
+
+        // Modal functionality
+        infoBtn.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            modal.setAttribute('aria-hidden', 'false');
+            closeModal.focus();
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            modal.setAttribute('aria-hidden', 'true');
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                modal.classList.add('hidden');
+                modal.setAttribute('aria-hidden', 'true');
+                infoBtn.focus();
+            }
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                modal.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        // Binomial coefficient calculation
+        function binomialCoefficient(n, k) {
+            if (k > n) return 0;
+            if (k === 0 || k === n) return 1;
+            
+            let result = 1;
+            for (let i = 0; i < k; i++) {
+                result = result * (n - i) / (i + 1);
+            }
+            return Math.round(result);
+        }
+
+        function calcularDistribucion(n) {
+            const distribution = [];
+            
+            // Calculate probability for each possible outcome
+            for (let x = 0; x <= n; x++) {
+                const combinations = binomialCoefficient(n, x);
+                const probability = combinations / Math.pow(2, n);
+                
+                distribution.push({
+                    x: x,
+                    combinations: combinations,
+                    probability: probability
+                });
+            }
+
+            // Calculate mean
+            let mean = 0;
+            for (let i = 0; i < distribution.length; i++) {
+                mean += distribution[i].x * distribution[i].probability;
+            }
+
+            // Calculate variance
+            let variance = 0;
+            for (let i = 0; i < distribution.length; i++) {
+                variance += Math.pow(distribution[i].x, 2) * distribution[i].probability;
+            }
+            variance -= Math.pow(mean, 2);
+
+            // Calculate standard deviation
+            const stdDev = Math.sqrt(variance);
+
+            return {
+                distribution,
+                mean,
+                variance,
+                stdDev
+            };
+        }
+
+        function displayResults(results, n) {
+            // Clear previous results
+            probabilityResults.innerHTML = '';
+            
+            // Display probabilities in simple text format
+            results.distribution.forEach(item => {
+                const p = document.createElement('p');
+                p.textContent = `P(X=${item.x}) = ${item.probability.toFixed(4)}`;
+                probabilityResults.appendChild(p);
+            });
+
+            // Display statistics
+            document.getElementById('meanResult').textContent = results.mean.toFixed(4);
+            document.getElementById('varianceResult').textContent = results.variance.toFixed(4);
+            document.getElementById('stdDevResult').textContent = results.stdDev.toFixed(4);
+
+            // Show results section
+            document.getElementById('results').classList.remove('hidden');
+        }
+
+        // Calculate button event listener
+        calculateBtn.addEventListener('click', () => {
+            const n = parseInt(numCoinsInput.value);
+
+            // Validate input
+            if (isNaN(n) || n < 1 || n > 10) {
+                alert('Por favor, ingresa un número válido de monedas (1-10).');
+                return;
+            }
+
+            // Calculate and display results
+            const calculationResults = calcularDistribucion(n);
+            displayResults(calculationResults, n);
+        });
+
+        // Auto-calculate on page load with default values
+        window.addEventListener('load', () => {
+            const calculationResults = calcularDistribucion(2);
+            displayResults(calculationResults, 2);
+        });
+    </script>
+</body>
+</html>

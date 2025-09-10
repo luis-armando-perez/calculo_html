@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aproximación Normal con Corrección por Continuidad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+        <!-- Info button -->
+        <button id="infoBtn" class="absolute top-4 right-4 w-6 h-6 bg-blue-500 text-white rounded-full text-xs font-bold hover:bg-blue-600 transition-colors" aria-label="Información">
+            i
+        </button>
+
+        <h1 class="text-xl font-bold text-gray-800 mb-6 text-center">Aproximación Normal con Corrección por Continuidad</h1>
+
+        <form id="calculatorForm" class="space-y-4">
+            <div>
+                <label for="n" class="block text-sm font-medium text-gray-700 mb-1">n (número de ensayos):</label>
+                <input type="number" id="n" value="14" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="p" class="block text-sm font-medium text-gray-700 mb-1">p (probabilidad de éxito):</label>
+                <input type="number" id="p" value="0.5" min="0" max="1" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="xMin" class="block text-sm font-medium text-gray-700 mb-1">x_min:</label>
+                <input type="number" id="xMin" value="4" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="xMax" class="block text-sm font-medium text-gray-700 mb-1">x_max:</label>
+                <input type="number" id="xMax" value="5" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="pTabla" class="block text-sm font-medium text-gray-700 mb-1">P_tabla (opcional, para comparar):</label>
+                <input type="number" id="pTabla" step="0.0001" min="0" max="1" placeholder="Valor de la tabla" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors font-medium">
+                Calcular
+            </button>
+        </form>
+
+        <div id="results" class="mt-6 hidden">
+            <h3 class="font-semibold text-gray-800 mb-2">Resultados:</h3>
+            <div id="resultsContent" class="text-sm text-gray-700 space-y-1"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg p-6 max-w-lg w-full max-h-96 overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-800">Conceptos y Fórmulas</h2>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700 text-xl font-bold" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="text-sm text-gray-700 space-y-3">
+                <p><strong>Concepto:</strong> A veces se usa la aproximación normal a la distribución binomial cuando n es grande y p no está demasiado cerca de 0 o 1.</p>
+                
+                <p><strong>Fórmulas clave:</strong></p>
+                <p>μ = n · p</p>
+                <p>σ = √(n · p · (1 - p))</p>
+                
+                <p><strong>Con corrección por continuidad:</strong></p>
+                <p>P(a ≤ X ≤ b) ≈ P(a - 0.5 < Y < b + 0.5)</p>
+                
+                <p><strong>Se transforma a puntajes z:</strong></p>
+                <p>z = (x - μ) / σ</p>
+                
+                <p>Luego se usa la tabla de la normal estándar para estimar las probabilidades.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Normal CDF approximation using Abramowitz and Stegun formula
+        function normalCDF(z) {
+            if (z < -6) return 0;
+            if (z > 6) return 1;
+            
+            const a1 =  0.254829592;
+            const a2 = -0.284496736;
+            const a3 =  1.421413741;
+            const a4 = -1.453152027;
+            const a5 =  1.061405429;
+            const p  =  0.3275911;
+            
+            const sign = z < 0 ? -1 : 1;
+            z = Math.abs(z);
+            
+            const t = 1.0 / (1.0 + p * z);
+            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-z * z);
+            
+            return 0.5 * (1.0 + sign * y);
+        }
+
+        // Modal functionality
+        const modal = document.getElementById('modal');
+        const infoBtn = document.getElementById('infoBtn');
+        const closeModal = document.getElementById('closeModal');
+
+        infoBtn.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        });
+
+        // Calculator functionality
+        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const n = parseInt(document.getElementById('n').value);
+            const p = parseFloat(document.getElementById('p').value);
+            const xMin = parseInt(document.getElementById('xMin').value);
+            const xMax = parseInt(document.getElementById('xMax').value);
+            const pTabla = document.getElementById('pTabla').value ? parseFloat(document.getElementById('pTabla').value) : null;
+            
+            // Calculate μ and σ
+            const mu = n * p;
+            const sigma = Math.sqrt(n * p * (1 - p));
+            
+            // Calculate z-scores with continuity correction
+            const z1 = (xMin - 0.5 - mu) / sigma;
+            const z2 = (xMax + 0.5 - mu) / sigma;
+            
+            // Calculate probability using normal CDF
+            const prob = normalCDF(z2) - normalCDF(z1);
+            
+            // Display results
+            const resultsDiv = document.getElementById('results');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            let html = `
+                <p><strong>μ = ${mu.toFixed(2)}</strong></p>
+                <p><strong>σ = ${sigma.toFixed(2)}</strong></p>
+                <p><strong>z₁ = ${z1.toFixed(2)}, z₂ = ${z2.toFixed(2)}</strong></p>
+                <p><strong>P(${xMin} ≤ X ≤ ${xMax}) ≈ ${prob.toFixed(4)} (${(prob * 100).toFixed(2)}%)</strong></p>
+            `;
+            
+            if (pTabla !== null) {
+                const difference = Math.abs(prob - pTabla);
+                html += `
+                    <p class="mt-2 pt-2 border-t border-gray-200">
+                        <strong>Comparación:</strong><br>
+                        Valor de tabla: ${pTabla.toFixed(4)} (${(pTabla * 100).toFixed(2)}%)<br>
+                        Diferencia: ${difference.toFixed(4)} (${(difference * 100).toFixed(2)}%)
+                    </p>
+                `;
+            }
+            
+            resultsContent.innerHTML = html;
+            resultsDiv.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
