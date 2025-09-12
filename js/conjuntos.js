@@ -93,6 +93,9 @@ document.getElementById("btnCalcular").addEventListener("click", () => {
 
   const resultadoOperacionEspecial = new Set([...complementoDifSim].filter(x => C.has(x)));
 
+  const resultadoDifSimInterC = new Set([...diferenciaSimetrica].filter(x => C.has(x)));
+
+
   document.getElementById("resultadoUnion").innerHTML = `<span class="text-gray-700">${[...union].join(", ")}</span>`;
   document.getElementById("resultadoInter").innerHTML = `<span class="text-gray-700">${[...interseccion].join(", ")}</span>`;
   document.getElementById("resultadoAB").innerHTML = `<span class="text-gray-700">${[...diferenciaAB].join(", ")}</span>`;
@@ -101,6 +104,8 @@ document.getElementById("btnCalcular").addEventListener("click", () => {
   document.getElementById("complementoA").innerHTML = `<span class="text-gray-700">${[...complementoA].join(", ")}</span>`;
   document.getElementById("complementoB").innerHTML = `<span class="text-gray-700">${[...complementoB].join(", ")}</span>`;
   document.getElementById("combinacionesResultados").innerHTML = `<span class="text-gray-700">${[...resultadoOperacionEspecial].join(", ")}</span>`;
+  document.getElementById("combinacionesResultadosDos").innerHTML = `<span class="text-gray-700">${[...resultadoDifSimInterC].join(", ")}</span>`;
+
 });
 
 
