@@ -105,7 +105,9 @@ document.getElementById("btnCalcular").addEventListener("click", () => {
   document.getElementById("complementoB").innerHTML = `<span class="text-gray-700">${[...complementoB].join(", ")}</span>`;
   document.getElementById("combinacionesResultados").innerHTML = `<span class="text-gray-700">${[...resultadoOperacionEspecial].join(", ")}</span>`;
   document.getElementById("combinacionesResultadosDos").innerHTML = `<span class="text-gray-700">${[...resultadoDifSimInterC].join(", ")}</span>`;
-
+  console.log("probando ramas"
+  );
+  
 });
 
 
